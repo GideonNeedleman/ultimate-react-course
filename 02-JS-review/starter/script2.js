@@ -143,105 +143,105 @@ function getBook(id) {
   return data.find((d) => d.id === id);
 }
 
-const book = getBook(1);
-book;
-/* const title = book.title;
-const author = book.author;
-book;
-console.log(book.pages); */
-
-const { title, author, pages, publicationDate, genres, hasMovieAdaptation } =
-  book;
-
-console.log(title, "by", author);
-
-const [primaryGenre, secondaryGenre, ...otherGenres] = genres;
-
-console.log(primaryGenre, secondaryGenre, otherGenres);
-
-const newGenres = [...genres, "epic fantasy"];
-
-console.log(newGenres);
-
-const updatedBook = {
-  ...book,
-  moviePublicationDate: "2001-12-19",
-};
-
-updatedBook;
-
-// String Literals
-
-const summary = `${title} is a ${pages} page book written by ${author}.`;
-summary;
-
-// Ternary operator
-
-const pagesRange = pages > 1000 ? "over a thousand" : "less than one thousand";
-
-pagesRange;
-
-console.log(`the book has ${pagesRange} pages`);
-
-// Arrow functions
-
-/* function getYear(str) {
-  return str.split("-")[0];
-} */
-
-const getYear = (str) => str.split("-")[0];
-
-console.log(getYear(publicationDate));
-
-// Short-circuiting
-
-console.log(true && "some string");
-
-console.log(false && "some string"); // when false, second condition not examined, like if statement
-
-console.log(hasMovieAdaptation && "this book has a movie");
-
-// falsy: 0, '', null, undefined
-console.log("jonas" && "some string");
-console.log(0 && "some string");
-
-// or operator reverse of and
-console.log(true || "some string");
-console.log(false || "some string");
-
-console.log(book.translations.spanish);
-
-const arabicTranslation = book.translations.arabic || "NOT TRANSLATED";
-arabicTranslation;
-
-// but falsy logic can produce errors if assume 0 is no data when 0 is actually 0.
-console.log(book.reviews.librarything.reviewsCount || "no data"); // if 0 reviews then would display 'no data' instead of number 0
-
-// Nullish coalescing operator
-
-const count = book.reviews.librarything.reviewsCount ?? "no data";
-count; // only returns second value when first value is NULL or undefined, but not for 0 or ''
-
-// OPTIONAL CHAINING
-
-// create function to get total reviews count (goodreads + librarything)
-
-function badTotalReviewCount(book) {
-  const goodreads = book.reviews.goodreads.reviewsCount;
-  const librarything = book.reviews.librarything.reviewsCount;
-  return goodreads + librarything;
-}
-
-console.log(badTotalReviewCount(book));
-
-// This fails for book 3 because no librarything property, so can't read book.reviews.librarything.reviewsCount
-
-// use optional chaining to only read next item if it exists
-
 function getTotalReviewCount(book) {
   const goodreads = book.reviews.goodreads.reviewsCount;
   const librarything = book.reviews.librarything?.reviewsCount ?? 0;
   return goodreads + librarything;
 }
 
-console.log(getTotalReviewCount(book));
+// 3 FUNCTIONAL ARRAY METHODS - MAP, FILTER, REDUCE
+
+const books = getBooks();
+
+// map method loops over array and returns new array with some operation applied to each array element
+
+const x = [1, 2, 3, 4, 5].map((el) => el * 2);
+console.log(x);
+
+const titles = books.map((book) => book.title);
+console.log(titles);
+
+const essentialData = books.map((book) => ({
+  title: book.title,
+  author: book.author,
+  reviewsCount: getTotalReviewCount(book),
+}));
+
+console.log(essentialData);
+
+//  FILTER METHOD - filter array based on some condition
+
+// only 500+ page books
+
+const longBooks = books.filter((book) => book.pages >= 500);
+console.log(longBooks);
+
+//can chain filter operations
+
+const longMovieBooks = books
+  .filter((book) => book.pages >= 500)
+  .filter((book) => book.hasMovieAdaptation);
+
+console.log(longMovieBooks);
+
+// only adventure books
+
+const adventureBooks = books
+  .filter((book) => book.genres.includes("adventure"))
+  .map((book) => book.title);
+
+console.log(adventureBooks);
+
+// ARRAY REDUCE METHOD - most versatile array method
+// perform mathematical operation with numbers, reduces entire array to a single value, like how many total pages of all books in array?
+
+// array.reduce((accumulator, element) => accumulator + element.property, initial value)
+
+const pagesAllBooks = books.reduce((sum, book) => sum + book.pages, 0);
+
+console.log(pagesAllBooks);
+
+// if initial value is an object or array, then can do more complex operations
+
+// ARRAY.SORT METHOD
+
+const arr = [3, 7, 1, 9, 6];
+const ascending = arr.sort((a, b) => a - b); // ascending sort. a and b represent the current element and the next element.
+console.log(ascending);
+
+const descending = arr.sort((a, b) => b - a);
+console.log(descending);
+
+console.log(arr); // sort method mutates original array
+// to avoid array mutation, make copy of array first.
+
+const newArray = arr.slice().sort((a, b) => a - b);
+console.log(newArray);
+console.log(arr);
+
+// usually need to sort an array of objects
+
+const sortedByPages = books.slice().sort((a, b) => b.pages - a.pages);
+console.log(sortedByPages);
+
+// IMMUTABLE ARRAYS: add, delete, update array elements without changing original array
+
+// 1) add a book object to array
+const newBook = {
+  id: 6,
+  title: "Harry Potter and the Chamber of Secrets",
+  author: "J. K. Rowling",
+};
+const booksAfterAdd = [...books, newBook];
+console.log(booksAfterAdd);
+
+// 2) delete a book object from array
+const booksAfterDel = booksAfterAdd.filter((book) => book.id !== 3);
+console.log(booksAfterDel);
+// usually create deleteBook(id) function to wrap this
+
+// 3) Update book object in the array
+const booksAfterUpdate = booksAfterDel.map((book) =>
+  book.id === 6 ? { ...book, pages: 3000 } : book
+);
+console.log(booksAfterUpdate);
